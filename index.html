@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Ice Bar</title>
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.7.0/dist/vuetify.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" name="viewport">
+</head>
+<body>
+<div id="app">
+    <v-app>
+        <v-main>
+            <v-container>
+                <v-row align-content="center" justify="center" style="height: 100vh">
+                    <p class="font-weight-medium" style="-webkit-text-stroke: 1px #444; font-size: 700%">
+                        <span style="color: #0060F0">S</span><!--
+                     --><span style="color: #F04020">e</span><!--
+                     --><span style="color: #FFC000">a</span><!--
+                     --><span style="color: #0060F0">r</span><!--
+                     --><span style="color: #109040">c</span><!--
+                     --><span style="color: #F04020">h</span>
+                    </p>
+
+                    <v-col class="col-12"></v-col>
+
+                    <v-col align="center" class="col-12">
+                        <v-text-field
+                            class="col-8 input-bar"
+                            solo
+                            prepend-inner-icon="mdi-magnify"
+                            rounded
+                            single-line
+                            color="#9A6B39"
+                            id="iceBar"
+                            ref="iceBar"
+                            hide-details
+                            style="z-index: 2"
+                            v-model="text"
+                            v-on:keydown.enter="setUrl"
+                            @click:prepend-inner="setUrl"
+                            @input="clearImg"
+                        >
+                        </v-text-field>
+                        <v-img id="iceImg" :src="imgUrl">
+                            <template v-if="isLoading">
+                                <v-row
+                                        class="fill-height ma-0"
+                                        align="center"
+                                        justify="center"
+                                >
+                                    <v-progress-circular
+                                            indeterminate
+                                            color="grey darken-1"
+                                            :size="progressCircularSize"
+                                    ></v-progress-circular>
+                                </v-row>
+                            </template>
+                        </v-img>
+                    </v-col>
+
+                    <v-col>
+                        <p style="visibility: hidden">dummy</p>
+                    </v-col>
+                </v-row>
+            </v-container>
+        </v-main>
+    </v-app>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.7.14"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@2.7.0"></script>
+<script type="module">
+    new Vue({
+        el: "#app",
+        vuetify: new Vuetify(),
+        data() {
+            return {
+                iceImg: null,
+                text: "",
+                imgUrl: "",
+                z: -1,
+                isLoading: false,
+                progressCircularSize: 0,
+            }
+        },
+        methods: {
+            setSize() {
+                this.iceImg = document.getElementById("iceImg");
+                let iceWidth = this.$refs.iceBar.$el.clientWidth / 1.5;
+                let clientRect = this.$refs.iceBar.$el.getBoundingClientRect();
+                let left = clientRect.right - iceWidth * 0.95;
+                let top = (clientRect.top + clientRect.bottom) / 2 - iceWidth / 3.6;
+                let style = `height: ${iceWidth / 1.8}px;width: ${iceWidth}px;position: absolute;left: ${left}px;top: ${top}px;border-radius: 5px ${iceWidth / 5}px ${iceWidth / 5}px 5px;z-index: ${this.z};`;
+                this.iceImg.setAttribute("style", style);
+                this.progressCircularSize = iceWidth / 6;
+            },
+            async setUrl() {
+                this.isLoading = true;
+                this.z = 10;
+                await this.setSize();
+
+                const data = await fetch(`https://pixabay-api.yadokari1130-game.workers.dev/?q=${this.text}`);
+                const json = await data.json();
+                this.isLoading = false;
+                if (json["total"] === 0) {
+                    this.z = -1;
+                    await this.setSize();
+                    alert("画像が見つかりませんでした・・・");
+                    return;
+                }
+                this.imgUrl = json["hits"][0]["webformatURL"];
+            },
+            clearImg() {
+                this.imgUrl = "";
+                this.z = -1;
+                this.setSize();
+            }
+        },
+        mounted() {
+            this.z = -1;
+            this.setSize();
+            window.addEventListener("resize", this.setSize);
+        },
+        beforeDestroy() {
+            window.removeEventListener("resize", this.setSize);
+        }
+    })
+</script>
+</body>
+
+<style scoped>
+    .v-input__slot {
+        background-image: url("img/bar.jpg") !important;
+    }
+
+    .input-bar input {
+        color: #7f572f !important;
+    }
+
+    .input-bar input {
+        color: #7f572f !important;
+    }
+
+    .input-bar i {
+        color: #7f572f !important;
+    }
+</style>
+</html>
