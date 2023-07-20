@@ -100,7 +100,6 @@
                 let clientRect = this.$refs.iceBar.$el.getBoundingClientRect();
                 let left = (window.scrollX + clientRect.right) - iceWidth * 0.95;
                 let top = (window.scrollY * 2 + clientRect.top + clientRect.bottom) / 2 - iceWidth / 3.6;
-                console.log(window.scrollY)
                 let style = `height: ${iceWidth / 1.8}px;width: ${iceWidth}px;position: absolute;left: ${left}px;top: ${top}px;border-radius: 5px ${iceWidth / 5}px ${iceWidth / 5}px 5px;z-index: ${this.z};`;
                 this.iceImg.setAttribute("style", style);
                 this.progressCircularSize = iceWidth / 6;
