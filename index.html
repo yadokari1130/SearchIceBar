@@ -90,6 +90,7 @@
                 z: -1,
                 isLoading: false,
                 progressCircularSize: 0,
+                scrollTimer: null,
             }
         },
         methods: {
@@ -123,15 +124,21 @@
                 this.imgUrl = "";
                 this.z = -1;
                 this.setSize();
+            },
+            onScroll() {
+                clearTimeout(this.scrollTimer);
+                this.scrollTimer = setTimeout(this.setSize, 33);
             }
         },
         mounted() {
             this.z = -1;
             this.setSize();
             window.addEventListener("resize", this.setSize);
+            window.addEventListener("scroll", this.onScroll);
         },
         beforeDestroy() {
             window.removeEventListener("resize", this.setSize);
+            window.removeEventListener("scroll", this.onScroll);
         }
     })
 </script>
